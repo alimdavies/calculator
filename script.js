@@ -1,3 +1,8 @@
+const keyboard = document.querySelector('#keyboard')
+const display = document.querySelector('#display span')
+
+let line = ''
+
 function add(a, b) {
     return a + b
 }
@@ -32,3 +37,16 @@ function operate(a, b, operator) {
             break;
     }
 }
+
+keyboard.addEventListener('click', (e) => {
+    e.preventDefault()
+    if(e.target.textContent == 'AC') {
+        line = ''
+        display.textContent = line
+    } else if(e.target.textContent == '=') {
+        operate()
+    } else {
+        line += e.target.textContent
+        display.textContent = line
+    }
+})
