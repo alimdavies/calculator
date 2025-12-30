@@ -20,12 +20,20 @@ body {
     justify-content: flex-end;
     padding-bottom: 10px;
     padding-right: 20px;
+    flex-direction: column;
 }
 
-#display span {
+#displayLine {
     color: white;
     font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
     font-size: 30px;
+    text-align: end;
+}
+
+#displayExpr {
+    color: white;
+    opacity: 50%;
+    text-align: end;
 }
 
 #keyboard { 
@@ -37,7 +45,15 @@ body {
 #keyboard button {
     box-sizing: border-box;
     flex: 0 0 25%;
+    height: 20%;
     font-size: 20px;
     border: none;
     outline: 1px solid black;
+    padding: 0;
+}
+
+#keyboard button img {
+    max-width: 40%;
+    height: auto;
+    margin: 5px 0 0 0;
 }
