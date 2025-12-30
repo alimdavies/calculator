@@ -72,11 +72,11 @@ function evaluate(target) {
             uploadExpr()
         }
     } else if(target.classList.contains('operator')) {
-        if(regex.exec(expr) == null) {
+        if(expr == '') {
+            return
+        } else if(regex.exec(expr) == null) {
             expr += input
             uploadExpr()
-        } else if(expr == '') {
-            return
         } else if(regex.exec(expr[expr.length - 1]) != null) {
             return
         } else {
@@ -112,6 +112,18 @@ function evaluate(target) {
             expr = expr.slice(0, -1)
             uploadExpr()
             clearDisplay()
+        }
+    } else if(input == '.') {
+        if(expr == '') {
+            return
+        } else if(expr.match(/\./) != null) {
+            return
+        } else if(regex.exec(expr[expr.length - 1]) != null) {
+            return
+        } else {
+            uploadDisplay(input)
+            expr += input
+            uploadExpr()
         }
     }
 }
