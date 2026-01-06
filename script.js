@@ -1,14 +1,9 @@
 const keyboard = document.querySelector('#keyboard')
-const display = document.querySelector('#displayLine')
+const displayLine = document.querySelector('#displayLine')
 const displayExpr = document.querySelector('#displayExpr')
 
-let displayLine = ''
-let expr = ''
-
-let ui = {
-    line: display,
-    expr: displayExpr
-}
+let regex = /\++|\-+|\*+|\/+/
+let decimalReg = /\./
 
 let calc = {
     line: '',
@@ -16,8 +11,8 @@ let calc = {
 }
 
 function render() {
-    ui.line = calc.line
-    ui.expr = calc.expr
+    displayLine.textContent = calc.line
+    displayExpr.textContent = calc.expr
 }
 
 function add(a, b) {
@@ -55,91 +50,94 @@ function operate(a, b, operator) {
     }
 }
 
-function displayValue(str) {
-    display.textContent = str
+function isOperatorLast() {
+    if(regex.test(calc.expr[calc.expr.length - 1]) == true) {
+        return true
+    } else {
+        return false
+    }
 }
 
-function uploadDisplay(str) {
-    display.textContent += str
+function containsOperator() {
+    if(regex.test(calc.expr) == true) {
+        return true
+    } else {
+        return false
+    }
 }
 
-function uploadExpr() {
-    displayExpr.textContent = expr
-}
-
-function clearDisplay() {
-    displayValue('')
-}
-
-let regex = /\++|\-+|\*+|\/+/
 
 function evaluate(button) {
     const data = button.getAttribute('data-value')
     if(data == null) {
         return
     } else if(button.classList.contains('number')) {
-        if(regex.test(expr[expr.length - 1]) == true) {
-            calc.line = data
-            calc.expr +=data
+        if(isOperatorLast()) {
+            calc.line = `${data}`
+            calc.expr += `${data}`
             render()
         } else {
-            calc.line += data
-            calc.expr += data
+            calc.line += `${data}`
+            calc.expr += `${data}`
             render()
         }
-    } else if(target.classList.contains('operator')) {
-        if(expr == '') {
+    } else if(button.classList.contains('operator')) {
+        if(calc.expr == '') {
             return
-        } else if(regex.exec(expr) == null) {
-            expr += input
-            uploadExpr()
-        } else if(regex.exec(expr[expr.length - 1]) != null) {
-            return
-        } else {
-            const index = regex.exec(expr).index
-            const operator = expr[index]
-            const arr = expr.split(expr[index])
+        } else if(!containsOperator()) {
+            calc.expr += `${data}`
+            render()
+        } else if(isOperatorLast()) {
+            calc.expr[calc.expr.length - 1] = `${data}`
+            render()
+        } else if(containsOperator()) {
+            const index = regex.exec(calc.expr).index
+            const operator = calc.expr[index]
+            const arr = calc.expr.split(operator)
             const result = operate(parseFloat(arr[0]), parseFloat(arr[1]), operator)
-            displayValue(result)
-            expr = `${result}${input}`
-            uploadExpr()
+            calc.line = `${result}`
+            calc.expr = `${result}${data}`
+            render()
         }
-    } else if(input == 'AC') {
-        clearDisplay()
-        expr = ''
-        uploadExpr()
-    } else if(input == '=') {
-        if(expr == '') {
-            return
-        } else if(regex.exec(expr[expr.length - 1]) != null) {
-            return
-        } else {
-            const index = regex.exec(expr).index
-            const operator = expr[index]
-            const arr = expr.split(expr[index])
+    } else if(data == 'AC') {
+        calc.line = ''
+        calc.expr = ''
+        render()
+    } else if(data == '=') {
+        if(containsOperator()) {
+            const index = regex.exec(calc.expr).index
+            const operator = calc.expr[index]
+            const arr = calc.expr.split(operator)
             const result = operate(parseFloat(arr[0]), parseFloat(arr[1]), operator)
-            displayValue(result)
-            expr = `${result}`
+            calc.line = `${result}`
+            calc.expr = `${result}`
+            render()
+        } else {
+            return
         }
-    } else if(target.classList.contains('backspace')) {
-        if(expr == '') {
+    } else if(button.classList.contains('backspace')) {
+        console.log('triggered')
+        if(calc.expr == '') {
+            return
+        } else if(isOperatorLast()) {
+            calc.expr = calc.expr.slice(0, -1)
+            render()
+        } else {
+            calc.line = calc.line.slice(0, -1)
+            calc.expr = calc.expr.slice(0, -1)
+            render()
+        }
+    } else if(data == '.') {
+        if(calc.expr == '' || calc.line == '') {
+            return
+        } else if(decimalReg.test(calc.line)) {
+            return
+        } else if(isOperatorLast()) {
             return
         } else {
-            expr = expr.slice(0, -1)
-            uploadExpr()
-            clearDisplay()
-        }
-    } else if(input == '.') {
-        if(expr == '') {
-            return
-        } else if(expr.match(/\./) != null) {
-            return
-        } else if(regex.exec(expr[expr.length - 1]) != null) {
-            return
-        } else {
-            uploadDisplay(input)
-            expr += input
-            uploadExpr()
+            calc.line += `${data}`
+            calc.expr += `${data}`
+            render()
         }
     }
 }
@@ -147,6 +145,8 @@ function evaluate(button) {
 keyboard.addEventListener('click', (e) => {
     e.preventDefault()
     const button = e.target.closest('button')
+    console.log(button.classList)
+    console.log(button.classList.contains('backspace'))
     if (!button) return
     evaluate(button)
 })
