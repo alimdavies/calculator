@@ -52,6 +52,10 @@ body {
     padding: 0;
 }
 
+#keyboard button:hover {
+    background-color: grey;
+}
+
 #keyboard button img {
     max-width: 40%;
     height: auto;

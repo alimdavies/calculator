@@ -5,6 +5,21 @@ const displayExpr = document.querySelector('#displayExpr')
 let displayLine = ''
 let expr = ''
 
+let ui = {
+    line: display,
+    expr: displayExpr
+}
+
+let calc = {
+    line: '',
+    expr: ''
+}
+
+function render() {
+    ui.line = calc.line
+    ui.expr = calc.expr
+}
+
 function add(a, b) {
     return a + b
 }
@@ -58,18 +73,19 @@ function clearDisplay() {
 
 let regex = /\++|\-+|\*+|\/+/
 
-function evaluate(target) {
-    const input = target.textContent
-    if(target.classList.contains('number')) {
-        if(regex.exec(expr[expr.length - 1]) != null) {
-            clearDisplay()
-            uploadDisplay(input)
-            expr += input
-            uploadExpr()
+function evaluate(button) {
+    const data = button.getAttribute('data-value')
+    if(data == null) {
+        return
+    } else if(button.classList.contains('number')) {
+        if(regex.test(expr[expr.length - 1]) == true) {
+            calc.line = data
+            calc.expr +=data
+            render()
         } else {
-            uploadDisplay(input)
-            expr += input
-            uploadExpr()
+            calc.line += data
+            calc.expr += data
+            render()
         }
     } else if(target.classList.contains('operator')) {
         if(expr == '') {
@@ -130,5 +146,7 @@ function evaluate(target) {
 
 keyboard.addEventListener('click', (e) => {
     e.preventDefault()
-    evaluate(e.target)
+    const button = e.target.closest('button')
+    if (!button) return
+    evaluate(button)
 })
